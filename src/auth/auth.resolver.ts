@@ -1,7 +1,10 @@
-import { Resolver, Mutation, Args, Query } from '@nestjs/graphql';
-import { SignupResponse, SignupInput ,LoginInput,LoginResponse} from 'src/graphql';
+import { Resolver, Mutation, Args, Query,} from '@nestjs/graphql';
+import { SignupResponse, SignupInput, LoginInput, LoginResponse, Profile } from 'src/graphql';
 import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
+import { resolve } from 'path';
+import { UseGuards } from '@nestjs/common';
+import { GraphQLAuthGaurd } from './gql-auth-guard';
 
 @Resolver()
 export class AuthResolver {
@@ -24,5 +27,15 @@ export class AuthResolver {
                 loginInput: LoginInput
         ): Promise<LoginResponse> {
                 return this.authService.login(loginInput);
+        }
+
+        @Query('profile')
+        @UseGuards(GraphQLAuthGaurd)
+        getProfile(parent, args, contextValue, info): Profile {
+                console.log(parent);
+                console.log(args);
+                console.log(contextValue);
+                console.log(info);
+                return contextValue.req.user;
         }
 }
